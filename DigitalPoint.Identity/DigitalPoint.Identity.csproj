@@ -15,7 +15,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalPoint.Aplication\DigitalPoint.Application.csproj" />
-    <ProjectReference Include="..\Domain\DigitalPoint.Domain.csproj" />
   </ItemGroup>
 
 </Project>

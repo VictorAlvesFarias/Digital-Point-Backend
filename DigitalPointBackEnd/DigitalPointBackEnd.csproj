@@ -18,8 +18,9 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Identity\DigitalPoint.Identity.csproj" />
-    <ProjectReference Include="..\Infrastructure\DigitalPoint.Infra.csproj" />
+    <ProjectReference Include="..\DigitalPoint.Aplication\DigitalPoint.Application.csproj" />
+    <ProjectReference Include="..\DigitalPoint.Identity\DigitalPoint.Identity.csproj" />
+    <ProjectReference Include="..\DigitalPoint.Infrastructure\DigitalPoint.Infrastructure.csproj" />
   </ItemGroup>
 
 </Project>

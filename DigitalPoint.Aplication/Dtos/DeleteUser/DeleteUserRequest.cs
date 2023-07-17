@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DigitalPoint.Application.Dtos.LoginUser
+namespace DigitalPoint.Application.Dtos.DeleteUser
 {
     public class DeleteUserRequest
     {

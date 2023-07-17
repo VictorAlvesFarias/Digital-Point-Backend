@@ -43,9 +43,14 @@ namespace DigitalPointBackEnd.Extensions
             });
 
             //Adicionando autenticação
-            services.AddAuthentication(options => {
+            services.AddAuthentication(options =>
+            {
                 options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+            }).AddJwtBearer(options =>
+            {
+
+                options.TokenValidationParameters = tokenValidationParameters;
             });
         }
 

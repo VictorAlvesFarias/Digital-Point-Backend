@@ -1,0 +1,9 @@
+Qual informaçao é usada para filtrar e entregar os dados para o usuario? 
+Qual informação seria a mais correta de entregar para o operador administrador do sitema, para que ele possa tomar ações sobre outros usuarios.
+Verficar uma maneira mais eficiente e correta de retornar os usuarios
+
+Validações de valores Vs Validação de Metodos
+
+Validações de valores, são representadas pelos campos, portanto, são os tipos e requisitos para um metodo ocorrer, podendo ser considerado retornos para inputs.
+
+Validações sobre metodos podem ser consideradas, validações de formularios, possuem outro campo para serem especificadas 

@@ -1,4 +1,5 @@
-﻿using DigitalPoint.Application.Dtos.GetAllUsers;
+﻿
+using DigitalPoint.Application.Dtos.DeleteUser;
 using DigitalPoint.Application.Dtos.InsertUser;
 using DigitalPoint.Application.Dtos.LoginUser;
 using Microsoft.AspNetCore.Identity;
@@ -14,9 +15,8 @@ namespace DigitalPoint.Application.Interfaces.Services
 
         Task<DeleteUserResponse> DeleteUser(DeleteUserRequest deleteUser);
 
-        Task<GetAllUsersResponse> GetAllUsers();
+        Task<string> CreateToken(IEnumerable<Claim> tokenClaims);
 
-        Task<LoginUserResponse> CreateToken(string email);
 
         Task<IList<Claim>> GetClaimsAndRoles(IdentityUser user);
     }

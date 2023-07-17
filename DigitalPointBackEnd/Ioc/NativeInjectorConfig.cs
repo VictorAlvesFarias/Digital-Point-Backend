@@ -17,6 +17,7 @@ namespace DigitalPointBackEnd.Ioc
                 .AddEntityFrameworkStores<DigitalPointContext>()
                 .AddDefaultTokenProviders();
 
+            services.AddSwagger();
             services.AddAuthentication(configuration);
 
         }

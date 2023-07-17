@@ -1,8 +1,9 @@
 ﻿
+using DigitalPoint.Application.Dtos.DeleteUser;
 using DigitalPoint.Application.Dtos.InsertUser;
 using DigitalPoint.Application.Dtos.LoginUser;
-using DigitalPoint.Application.Dtos.GetAllUsers;
 using DigitalPoint.Application.Interfaces.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DigitalPointBackEnd.Controllers
@@ -56,26 +57,7 @@ namespace DigitalPointBackEnd.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        [HttpGet("/get-all-users")]
-        public async Task<ActionResult<GetAllUsersResponse>> GetAllUsers()
-        {
-
-            var result = await _identityService.GetAllUsers();
-
-            if (result.Success)
-            {
-                return Ok(result);
-            }
-
-            else if (result.Errors.Count > 0)
-            {
-                return BadRequest(result);
-            }
-
-            return StatusCode(StatusCodes.Status500InternalServerError);
-
-        }
-
+        [Authorize]
         [HttpDelete("/delete-users")]
         public async Task<ActionResult<DeleteUserResponse>> DeleteUser([FromBody] DeleteUserRequest deleteUser)
         {

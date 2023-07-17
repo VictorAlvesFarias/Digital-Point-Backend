@@ -1,13 +1,12 @@
-﻿using DigitalPoint.Application.Dtos.InsertUser;
+﻿using DigitalPoint.Application.Dtos.DeleteUser;
+using DigitalPoint.Application.Dtos.InsertUser;
 using DigitalPoint.Application.Dtos.LoginUser;
-using DigitalPoint.Application.Dtos.GetAllUsers;
 using DigitalPoint.Application.Interfaces.Services;
 using DigitalPoint.Identity.Configuration;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
-using Microsoft.EntityFrameworkCore;
 
 namespace DigitalPoint.Identity.Services
 {
@@ -19,13 +18,11 @@ namespace DigitalPoint.Identity.Services
         private readonly UserManager<IdentityUser> _userManager;
 
         private readonly JwtOptions _jwtOptions;
-
-        public IdentityService(SignInManager<IdentityUser> singInManager,UserManager<IdentityUser> userManager,IOptions<JwtOptions> jwtOptions) {
+        public IdentityService(SignInManager<IdentityUser> singInManager, UserManager<IdentityUser> userManager, IOptions<JwtOptions> jwtOptions) {
             _singInManager = singInManager;
             _userManager = userManager;
             _jwtOptions = jwtOptions.Value;
         }
-
         public async Task<IList<Claim>> GetClaimsAndRoles(IdentityUser user) {
 
             var claims = await _userManager.GetClaimsAsync(user);
@@ -50,12 +47,7 @@ namespace DigitalPoint.Identity.Services
             return claims;
 
         }
-
-        public async Task<LoginUserResponse> CreateToken(string email) {
-
-            var user = await _userManager.FindByNameAsync(email);
-
-            var tokenClaims = await _userManager.GetClaimsAsync(user);
+        public async Task<string> CreateToken(IEnumerable<Claim> tokenClaims) {
 
             var jwt = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
@@ -67,12 +59,9 @@ namespace DigitalPoint.Identity.Services
 
             var token = new JwtSecurityTokenHandler().WriteToken(jwt);
 
-            return new LoginUserResponse(
-                success: true,
-                token: token
-            );
-        }
+            return token;
 
+        }
         public async Task<InsertUserResponse> InsertUser(InsertUserRequest insertUser) {
 
             var identityUser = new IdentityUser {
@@ -83,30 +72,30 @@ namespace DigitalPoint.Identity.Services
 
             var result = await _userManager.CreateAsync(identityUser, insertUser.Password);
 
+            var insertUserResponse = new InsertUserResponse(result.Succeeded);
+
             if (result.Succeeded)
             {
                 await _userManager.SetLockoutEnabledAsync(identityUser, false);
-            };
+            }
 
-            var insertUserResponse = new InsertUserResponse(result.Succeeded);
-
-            if (!result.Succeeded && result.Errors.Count() > 0)
+            else if (!result.Succeeded && result.Errors.Count() > 0)
             {
                 insertUserResponse.AddErrors(result.Errors.Select(r => r.Description));
-            };
+            }
+
 
             return insertUserResponse;
 
         }
-
         public async Task<LoginUserResponse> LoginUser(LoginUserRequest loginUser) {
 
             var result = await _singInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, false);
 
             var loginUserResponse = new LoginUserResponse(result.Succeeded);
 
-            if (result.Succeeded){
-                return await CreateToken(loginUser.Email);
+            if (result.Succeeded) {
+                return await CreateCredentials(loginUser.Email);
             }
 
             else if (!result.Succeeded) {
@@ -118,58 +107,60 @@ namespace DigitalPoint.Identity.Services
             };
 
             return loginUserResponse;
+
         }
+        public async Task<LoginUserResponse> CreateCredentials(string Email) {
 
-        public async Task<GetAllUsersResponse> GetAllUsers() {
-            try
-            {
-                var result = await _userManager.Users.ToListAsync();
+            var user = await _userManager.FindByNameAsync(Email);
 
-                var getAllUsersResponse = new GetAllUsersResponse(
-                    success: true,
-                    users: result
-                );
+            var claims = await GetClaimsAndRoles(user);
 
-                return getAllUsersResponse;
-            }
-            catch
-            {
+            var token = await CreateToken(claims);
 
-                var getAllUsersResponse = new GetAllUsersResponse(
-                    success: false,
-                    users: null
-                );
+            var dataExpiracaoAccessToken = DateTime.Now.AddSeconds(_jwtOptions.AccessTokenExpiration);
 
-                getAllUsersResponse.AddError("Contatct the Administrator");
-
-                return getAllUsersResponse;
-            }
+            return new LoginUserResponse(
+                 success: true,
+                 token: token
+             );
         }
-
         public async Task<DeleteUserResponse> DeleteUser(DeleteUserRequest deleteUser) {
+            try {
+                var user = await _userManager.FindByEmailAsync(deleteUser.Email);
 
-            var user = await _userManager.FindByEmailAsync(deleteUser.Email);
+                if (user != null) {
+                    var result = await _userManager.DeleteAsync(user);
 
-            var result = await _userManager.DeleteAsync(user);
+                    var deleteUserResponse = new DeleteUserResponse(result.Succeeded);
 
-            var deleteUserResponse = new DeleteUserResponse(result.Succeeded);
+                    if (result.Succeeded)
+                    {
+                        return deleteUserResponse;
+                    }
 
-            if (result.Succeeded)
-            {
- 
+                    else if (!result.Succeeded && result.Errors.Count() > 0)
+                    {
+                        deleteUserResponse.AddErrors(result.Errors.Select(r => r.Description));
+                    }
+
+                    return deleteUserResponse;
+                }
+
+                else
+                {
+                    var deleteUserResponse = new DeleteUserResponse(false);
+                    deleteUserResponse.AddError("User is not find");
+                    return deleteUserResponse;
+                }
+
+            }
+            catch {
+                var deleteUserResponse = new DeleteUserResponse(false);
+                deleteUserResponse.AddError("Contact the Administrator");
+                return deleteUserResponse;
             }
 
-            else if (!result.Succeeded)
-            {
-                deleteUserResponse.AddError("Fail Delete");
-            }
-
-            else
-            {
-                deleteUserResponse.AddError("Contatct the Administrator");
-            };
-
-            return deleteUserResponse;
         }
+
     }
  }

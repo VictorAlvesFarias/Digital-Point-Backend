@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Domain\DigitalPoint.Domain.csproj" />
+    <ProjectReference Include="..\DigitalPoint.Domain\DigitalPoint.Domain.csproj" />
   </ItemGroup>
 
   <ItemGroup>
