@@ -1,4 +1,4 @@
-﻿namespace DigitalPoint.Application.Dtos.LoginUser
+﻿namespace DigitalPoint.Application.Dtos.User.LoginUser 
 {
     public class LoginUserResponse
     {
@@ -14,7 +14,8 @@
 
         public LoginUserResponse(bool success = true) : this() => Success = success;
 
-        public LoginUserResponse(bool success, string token) : this(success) {
+        public LoginUserResponse(bool success, string token) : this(success)
+        {
             Token = token;
         }
 
@@ -25,7 +26,4 @@
         public void AddError(string error) => Errors.Add(error);
 
     }
-
-
-}
-
+};

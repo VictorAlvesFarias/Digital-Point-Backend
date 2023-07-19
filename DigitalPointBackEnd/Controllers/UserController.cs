@@ -1,10 +1,11 @@
-﻿
-using DigitalPoint.Application.Dtos.DeleteUser;
-using DigitalPoint.Application.Dtos.InsertUser;
-using DigitalPoint.Application.Dtos.LoginUser;
-using DigitalPoint.Application.Interfaces.Services;
+﻿using DigitalPoint.Application.Dtos.User.DeleteUser;
+using DigitalPoint.Application.Dtos.User.InsertUser;
+using DigitalPoint.Application.Dtos.User.LoginUser;
+using DigitalPoint.Application.Dtos.User.PutUser;
+using DigitalPoint.Application.Interfaces.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace DigitalPointBackEnd.Controllers
 {
@@ -17,6 +18,11 @@ namespace DigitalPointBackEnd.Controllers
         public UserController(IIdentityService identityService)
         {
             _identityService = identityService;
+        }
+
+        public IIdentityService Get_identityService()
+        {
+            return _identityService;
         }
 
         [HttpPost("/create-user")]
@@ -57,7 +63,7 @@ namespace DigitalPointBackEnd.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        [Authorize]
+        [Authorize]        
         [HttpDelete("/delete-users")]
         public async Task<ActionResult<DeleteUserResponse>> DeleteUser([FromBody] DeleteUserRequest deleteUser)
         {
@@ -76,6 +82,27 @@ namespace DigitalPointBackEnd.Controllers
 
             return StatusCode(StatusCodes.Status500InternalServerError);
 
+        }
+
+        [Authorize]
+        [HttpPut("/update-users")]
+        public async Task<ActionResult<PutUserResponse>> PutUser([FromBody] PutUserRequest deleteUser)
+        {
+            var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+            var result = await _identityService.PutUser(deleteUser, id);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            else if (result.Errors.Count > 0)
+            {
+                return BadRequest(result);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
         }
     }
 }

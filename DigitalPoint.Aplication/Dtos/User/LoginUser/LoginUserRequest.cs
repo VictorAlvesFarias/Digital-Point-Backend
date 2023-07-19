@@ -1,7 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DigitalPoint.Application.Dtos.LoginUser
+namespace DigitalPoint.Application.Dtos.User.LoginUser 
 {
+
     public class LoginUserRequest
     {
         [Required(ErrorMessage = "")]
@@ -14,4 +15,5 @@ namespace DigitalPoint.Application.Dtos.LoginUser
         public string Password { get; set; }
 
     }
-}
+
+};

@@ -8,10 +8,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalPoint.Domain\DigitalPoint.Domain.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Interfaces\Repos\" />
+	      <ProjectReference Include="..\DigitalPoint.Infrastructure\DigitalPoint.Infrastructure.csproj" />	  	      
   </ItemGroup>
 
 </Project>

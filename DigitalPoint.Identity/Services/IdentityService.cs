@@ -1,12 +1,13 @@
-﻿using DigitalPoint.Application.Dtos.DeleteUser;
-using DigitalPoint.Application.Dtos.InsertUser;
-using DigitalPoint.Application.Dtos.LoginUser;
-using DigitalPoint.Application.Interfaces.Services;
-using DigitalPoint.Identity.Configuration;
+﻿using DigitalPoint.Identity.Configuration;
+using System.Security.Claims;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
+using DigitalPoint.Application.Interfaces.Identity;
+using DigitalPoint.Application.Dtos.User.DeleteUser;
+using DigitalPoint.Application.Dtos.User.InsertUser;
+using DigitalPoint.Application.Dtos.User.LoginUser;
+using DigitalPoint.Application.Dtos.User.PutUser;
 
 namespace DigitalPoint.Identity.Services
 {
@@ -18,11 +19,13 @@ namespace DigitalPoint.Identity.Services
         private readonly UserManager<IdentityUser> _userManager;
 
         private readonly JwtOptions _jwtOptions;
+
         public IdentityService(SignInManager<IdentityUser> singInManager, UserManager<IdentityUser> userManager, IOptions<JwtOptions> jwtOptions) {
             _singInManager = singInManager;
             _userManager = userManager;
             _jwtOptions = jwtOptions.Value;
         }
+
         public async Task<IList<Claim>> GetClaimsAndRoles(IdentityUser user) {
 
             var claims = await _userManager.GetClaimsAsync(user);
@@ -47,12 +50,14 @@ namespace DigitalPoint.Identity.Services
             return claims;
 
         }
-        public async Task<string> CreateToken(IEnumerable<Claim> tokenClaims) {
+
+        public async Task<string> CreateToken(IEnumerable<Claim> tokenClaims,DateTime expiration) {
 
             var jwt = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
                 audience: _jwtOptions.Audience,
                 claims: tokenClaims,
+                expires: expiration,
                 notBefore: DateTime.Now,
                 signingCredentials: _jwtOptions.SigningCredentials
             );
@@ -62,6 +67,7 @@ namespace DigitalPoint.Identity.Services
             return token;
 
         }
+
         public async Task<InsertUserResponse> InsertUser(InsertUserRequest insertUser) {
 
             var identityUser = new IdentityUser {
@@ -88,6 +94,7 @@ namespace DigitalPoint.Identity.Services
             return insertUserResponse;
 
         }
+
         public async Task<LoginUserResponse> LoginUser(LoginUserRequest loginUser) {
 
             var result = await _singInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, false);
@@ -109,21 +116,23 @@ namespace DigitalPoint.Identity.Services
             return loginUserResponse;
 
         }
+
         public async Task<LoginUserResponse> CreateCredentials(string Email) {
 
             var user = await _userManager.FindByNameAsync(Email);
 
             var claims = await GetClaimsAndRoles(user);
 
-            var token = await CreateToken(claims);
+            var expiresDate = DateTime.Now.AddSeconds(_jwtOptions.AccessTokenExpiration);
 
-            var dataExpiracaoAccessToken = DateTime.Now.AddSeconds(_jwtOptions.AccessTokenExpiration);
+            var token = await CreateToken(claims, expiresDate);
 
             return new LoginUserResponse(
                  success: true,
                  token: token
              );
         }
+
         public async Task<DeleteUserResponse> DeleteUser(DeleteUserRequest deleteUser) {
             try {
                 var user = await _userManager.FindByEmailAsync(deleteUser.Email);
@@ -160,6 +169,38 @@ namespace DigitalPoint.Identity.Services
                 return deleteUserResponse;
             }
 
+        }
+
+        public async Task<PutUserResponse> PutUser(PutUserRequest putUser, string Id)
+        {
+            var user = await _userManager.FindByIdAsync(Id);
+
+            var password = _userManager.PasswordHasher.HashPassword(user, putUser.Password);
+
+            user.UserName = putUser.UserName;
+            user.Email = putUser.Email;
+            user.PasswordHash = password;
+
+            var result = await _userManager.UpdateAsync(user);
+
+            var putUserResponse = new PutUserResponse(result.Succeeded);
+
+            if (result.Succeeded)
+            {
+                return new PutUserResponse
+                {
+                    UserName = user.UserName,
+                    Email = user.Email,
+                    Success = true,
+                };
+            }
+
+            else if (!result.Succeeded)
+            {
+                putUserResponse.AddErrors(result.Errors.Select(r => r.Description));
+            }
+
+            return putUserResponse;
         }
 
     }

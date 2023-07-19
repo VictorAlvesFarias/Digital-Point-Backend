@@ -3,10 +3,10 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace DigitalPoint.Infra.Migrations
+namespace DigitalPoint.Infrastructure.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class MigrationDatabase : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -158,27 +158,26 @@ namespace DigitalPoint.Infra.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "WorkPointsHistorics",
+                name: "WorkPoints",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Day = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    DepartureTimeHour = table.Column<int>(type: "int", nullable: false),
-                    DepartureTimeMinute = table.Column<int>(type: "int", nullable: false),
-                    EntryTimeHour = table.Column<int>(type: "int", nullable: false),
-                    EntryTimeMinute = table.Column<int>(type: "int", nullable: false),
+                    DepartureTime = table.Column<int>(type: "int", nullable: false),
+                    EntryTime = table.Column<int>(type: "int", nullable: false),
                     Attendance = table.Column<bool>(type: "bit", nullable: false),
-                    UserId = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    ApplicationUserId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_WorkPointsHistorics", x => x.Id);
+                    table.PrimaryKey("PK_WorkPoints", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_WorkPointsHistorics_AspNetUsers_UserId",
-                        column: x => x.UserId,
+                        name: "FK_WorkPoints_AspNetUsers_ApplicationUserId",
+                        column: x => x.ApplicationUserId,
                         principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateIndex(
@@ -221,9 +220,9 @@ namespace DigitalPoint.Infra.Migrations
                 filter: "[NormalizedUserName] IS NOT NULL");
 
             migrationBuilder.CreateIndex(
-                name: "IX_WorkPointsHistorics_UserId",
-                table: "WorkPointsHistorics",
-                column: "UserId");
+                name: "IX_WorkPoints_ApplicationUserId",
+                table: "WorkPoints",
+                column: "ApplicationUserId");
         }
 
         /// <inheritdoc />
@@ -245,7 +244,7 @@ namespace DigitalPoint.Infra.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "WorkPointsHistorics");
+                name: "WorkPoints");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoles");

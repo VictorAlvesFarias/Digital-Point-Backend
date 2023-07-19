@@ -8,6 +8,6 @@ public class DigitalPointContext : IdentityDbContext
 {
     public DigitalPointContext(DbContextOptions options) : base(options){}
     public DbSet<ApplicationUser> ApplicationUser { get; set; }
-    public DbSet<WorkPoints> WorkPoints { get; set; }
+    public DbSet<WorkPoint> WorkPoints { get; set; }
 
 }

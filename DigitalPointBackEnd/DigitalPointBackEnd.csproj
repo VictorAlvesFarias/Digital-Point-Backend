@@ -19,8 +19,13 @@
 
   <ItemGroup>
     <ProjectReference Include="..\DigitalPoint.Aplication\DigitalPoint.Application.csproj" />
+    <ProjectReference Include="..\DigitalPoint.Domain\DigitalPoint.Domain.csproj" />
     <ProjectReference Include="..\DigitalPoint.Identity\DigitalPoint.Identity.csproj" />
     <ProjectReference Include="..\DigitalPoint.Infrastructure\DigitalPoint.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Repositories\" />
   </ItemGroup>
 
 </Project>

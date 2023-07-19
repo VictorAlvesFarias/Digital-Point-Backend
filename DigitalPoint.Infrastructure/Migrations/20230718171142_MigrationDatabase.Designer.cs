@@ -9,11 +9,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace DigitalPoint.Infra.Migrations
+namespace DigitalPoint.Infrastructure.Migrations
 {
     [DbContext(typeof(DigitalPointContext))]
-    [Migration("20230713123052_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20230718171142_MigrationDatabase")]
+    partial class MigrationDatabase
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -25,7 +25,7 @@ namespace DigitalPoint.Infra.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("DigitalPoint.Domain.Entities.WorkPoints", b =>
+            modelBuilder.Entity("DigitalPoint.Domain.Entities.WorkPoint", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -33,32 +33,27 @@ namespace DigitalPoint.Infra.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("ApplicationUserId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(450)");
+
                     b.Property<bool>("Attendance")
                         .HasColumnType("bit");
 
                     b.Property<DateTime>("Day")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("DepartureTimeHour")
+                    b.Property<int>("DepartureTime")
                         .HasColumnType("int");
 
-                    b.Property<int>("DepartureTimeMinute")
+                    b.Property<int>("EntryTime")
                         .HasColumnType("int");
-
-                    b.Property<int>("EntryTimeHour")
-                        .HasColumnType("int");
-
-                    b.Property<int>("EntryTimeMinute")
-                        .HasColumnType("int");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
 
                     b.HasKey("Id");
 
-                    b.HasIndex("UserId");
+                    b.HasIndex("ApplicationUserId");
 
-                    b.ToTable("WorkPointsHistorics");
+                    b.ToTable("WorkPoints");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
@@ -278,13 +273,15 @@ namespace DigitalPoint.Infra.Migrations
                     b.HasDiscriminator().HasValue("ApplicationUser");
                 });
 
-            modelBuilder.Entity("DigitalPoint.Domain.Entities.WorkPoints", b =>
+            modelBuilder.Entity("DigitalPoint.Domain.Entities.WorkPoint", b =>
                 {
-                    b.HasOne("DigitalPoint.Domain.Entities.ApplicationUser", "User")
-                        .WithMany("WorkPointsHistoric")
-                        .HasForeignKey("UserId");
+                    b.HasOne("DigitalPoint.Domain.Entities.ApplicationUser", "ApplicationUser")
+                        .WithMany()
+                        .HasForeignKey("ApplicationUserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    b.Navigation("User");
+                    b.Navigation("ApplicationUser");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -336,11 +333,6 @@ namespace DigitalPoint.Infra.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
-                });
-
-            modelBuilder.Entity("DigitalPoint.Domain.Entities.ApplicationUser", b =>
-                {
-                    b.Navigation("WorkPointsHistoric");
                 });
 #pragma warning restore 612, 618
         }

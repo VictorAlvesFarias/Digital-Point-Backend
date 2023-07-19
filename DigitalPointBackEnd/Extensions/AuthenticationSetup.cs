@@ -18,11 +18,16 @@ namespace DigitalPointBackEnd.Extensions
             //Requisitos de Token
             var tokenValidationParameters = new TokenValidationParameters { 
                 ValidateIssuer = true,
-                ValidIssuer = configuration.GetSection("JwtOption:Issuer").Value,
+                ValidIssuer = configuration.GetSection("JwtOptions:Issuer").Value,
+
                 ValidateAudience = true, 
-                ValidAudience = configuration.GetSection("JwtOption:Audience").Value,
+                ValidAudience = configuration.GetSection("JwtOptions:Audience").Value,
+
                 ValidateIssuerSigningKey = true,
-                IssuerSigningKey = securityKey
+                IssuerSigningKey = securityKey,
+
+                RequireExpirationTime = true,
+                ValidateLifetime = true
             };
 
             //Configuração de geração de Token
@@ -30,6 +35,7 @@ namespace DigitalPointBackEnd.Extensions
                 options.Issuer = JwtAppSettings[nameof(JwtOptions.Issuer)];
                 options.Audience = JwtAppSettings[nameof(JwtOptions.Audience)];
                 options.SigningCredentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha512);
+                options.AccessTokenExpiration = int.Parse(JwtAppSettings[nameof(JwtOptions.AccessTokenExpiration)] ?? "0");
             });
 
             //Requisitos de geração de senha senha
@@ -49,7 +55,7 @@ namespace DigitalPointBackEnd.Extensions
                 options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
             }).AddJwtBearer(options =>
             {
-
+                options.SaveToken = true;
                 options.TokenValidationParameters = tokenValidationParameters;
             });
         }

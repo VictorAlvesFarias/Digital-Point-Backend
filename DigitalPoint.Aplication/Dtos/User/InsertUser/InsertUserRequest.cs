@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace DigitalPoint.Application.Dtos.InsertUser
+namespace DigitalPoint.Application.Dtos.User.InsertUser
 {
     public class InsertUserRequest
     {
@@ -15,5 +15,7 @@ namespace DigitalPoint.Application.Dtos.InsertUser
         [Compare(nameof(Password), ErrorMessage = "As senhas devem ser iguais")]
         public string PasswordConfirm { get; set; }
     }
-}
+};
+
+
 
