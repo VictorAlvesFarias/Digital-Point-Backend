@@ -8,25 +8,26 @@ using DigitalPoint.Application.Dtos.User.DeleteUser;
 using DigitalPoint.Application.Dtos.User.InsertUser;
 using DigitalPoint.Application.Dtos.User.LoginUser;
 using DigitalPoint.Application.Dtos.User.PutUser;
+using DigitalPoint.Domain.Entities;
 
 namespace DigitalPoint.Identity.Services
 {
     public class IdentityService : IIdentityService
     {
 
-        private readonly SignInManager<IdentityUser> _singInManager;
+        private readonly SignInManager<ApplicationUser> _singInManager;
 
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         private readonly JwtOptions _jwtOptions;
 
-        public IdentityService(SignInManager<IdentityUser> singInManager, UserManager<IdentityUser> userManager, IOptions<JwtOptions> jwtOptions) {
+        public IdentityService(SignInManager<ApplicationUser> singInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions) {
             _singInManager = singInManager;
             _userManager = userManager;
             _jwtOptions = jwtOptions.Value;
         }
 
-        public async Task<IList<Claim>> GetClaimsAndRoles(IdentityUser user) {
+        public async Task<IList<Claim>> GetClaimsAndRoles(ApplicationUser user) {
 
             var claims = await _userManager.GetClaimsAsync(user);
 
@@ -70,26 +71,26 @@ namespace DigitalPoint.Identity.Services
 
         public async Task<InsertUserResponse> InsertUser(InsertUserRequest insertUser) {
 
-            var identityUser = new IdentityUser {
+            var applicationUser = new ApplicationUser
+            {
                 UserName = insertUser.Email,
                 Email = insertUser.Email,
                 EmailConfirmed = true,
             };
 
-            var result = await _userManager.CreateAsync(identityUser, insertUser.Password);
+            var result = await _userManager.CreateAsync(applicationUser, insertUser.Password);
 
             var insertUserResponse = new InsertUserResponse(result.Succeeded);
 
             if (result.Succeeded)
             {
-                await _userManager.SetLockoutEnabledAsync(identityUser, false);
+                await _userManager.SetLockoutEnabledAsync(applicationUser, false);
             }
 
             else if (!result.Succeeded && result.Errors.Count() > 0)
             {
                 insertUserResponse.AddErrors(result.Errors.Select(r => r.Description));
             }
-
 
             return insertUserResponse;
 
@@ -108,10 +109,6 @@ namespace DigitalPoint.Identity.Services
             else if (!result.Succeeded) {
                 loginUserResponse.AddError("Fail Login");
             }
-
-            else {
-                loginUserResponse.AddError("Contatct the Administrator");
-            };
 
             return loginUserResponse;
 
@@ -133,9 +130,8 @@ namespace DigitalPoint.Identity.Services
              );
         }
 
-        public async Task<DeleteUserResponse> DeleteUser(DeleteUserRequest deleteUser) {
-            try {
-                var user = await _userManager.FindByEmailAsync(deleteUser.Email);
+        public async Task<DeleteUserResponse> DeleteUser(string id) {
+                var user = await _userManager.FindByIdAsync(id);
 
                 if (user != null) {
                     var result = await _userManager.DeleteAsync(user);
@@ -161,14 +157,6 @@ namespace DigitalPoint.Identity.Services
                     deleteUserResponse.AddError("User is not find");
                     return deleteUserResponse;
                 }
-
-            }
-            catch {
-                var deleteUserResponse = new DeleteUserResponse(false);
-                deleteUserResponse.AddError("Contact the Administrator");
-                return deleteUserResponse;
-            }
-
         }
 
         public async Task<PutUserResponse> PutUser(PutUserRequest putUser, string Id)
@@ -189,8 +177,6 @@ namespace DigitalPoint.Identity.Services
             {
                 return new PutUserResponse
                 {
-                    UserName = user.UserName,
-                    Email = user.Email,
                     Success = true,
                 };
             }

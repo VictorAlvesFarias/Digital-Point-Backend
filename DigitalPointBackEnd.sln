@@ -4,14 +4,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 17.6.33815.320
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalPointBackEnd", "DigitalPointBackEnd\DigitalPointBackEnd.csproj", "{684452AA-1CDF-4C28-862B-56DA4D9280A7}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalPoint.Application", "DigitalPoint.Aplication\DigitalPoint.Application.csproj", "{E336068A-BD72-44D5-AF34-69CF428CA6AE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{B1BB90D8-4720-4ACB-B29B-06781D01CF22} = {B1BB90D8-4720-4ACB-B29B-06781D01CF22}
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalPoint.Domain", "DigitalPoint.Domain\DigitalPoint.Domain.csproj", "{5F4A121D-BBF5-4C82-B04A-E31957B9814C}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalPoint.Identity", "DigitalPoint.Identity\DigitalPoint.Identity.csproj", "{E9F00AAD-6D1F-48A5-A1FA-2A93D78BE832}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalPoint.Infrastructure", "DigitalPoint.Infrastructure\DigitalPoint.Infrastructure.csproj", "{B1BB90D8-4720-4ACB-B29B-06781D01CF22}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DigitalPoint.Application", "DigitalPoint.Application\DigitalPoint.Application.csproj", "{0964E3DF-3E2F-46C4-8DA6-17ADF3ABCD67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +26,6 @@ Global
 		{684452AA-1CDF-4C28-862B-56DA4D9280A7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{684452AA-1CDF-4C28-862B-56DA4D9280A7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{684452AA-1CDF-4C28-862B-56DA4D9280A7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{E336068A-BD72-44D5-AF34-69CF428CA6AE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E336068A-BD72-44D5-AF34-69CF428CA6AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E336068A-BD72-44D5-AF34-69CF428CA6AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E336068A-BD72-44D5-AF34-69CF428CA6AE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5F4A121D-BBF5-4C82-B04A-E31957B9814C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5F4A121D-BBF5-4C82-B04A-E31957B9814C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5F4A121D-BBF5-4C82-B04A-E31957B9814C}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -39,6 +38,10 @@ Global
 		{B1BB90D8-4720-4ACB-B29B-06781D01CF22}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B1BB90D8-4720-4ACB-B29B-06781D01CF22}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B1BB90D8-4720-4ACB-B29B-06781D01CF22}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0964E3DF-3E2F-46C4-8DA6-17ADF3ABCD67}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0964E3DF-3E2F-46C4-8DA6-17ADF3ABCD67}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0964E3DF-3E2F-46C4-8DA6-17ADF3ABCD67}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0964E3DF-3E2F-46C4-8DA6-17ADF3ABCD67}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

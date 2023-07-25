@@ -1,4 +1,5 @@
-﻿using DigitalPoint.Application.Dtos.User.DeleteUser;
+﻿
+using DigitalPoint.Application.Dtos.User.DeleteUser;
 using DigitalPoint.Application.Dtos.User.InsertUser;
 using DigitalPoint.Application.Dtos.User.LoginUser;
 using DigitalPoint.Application.Dtos.User.PutUser;
@@ -64,11 +65,12 @@ namespace DigitalPointBackEnd.Controllers
         }
 
         [Authorize]        
-        [HttpDelete("/delete-users")]
-        public async Task<ActionResult<DeleteUserResponse>> DeleteUser([FromBody] DeleteUserRequest deleteUser)
+        [HttpDelete("/delete-current-user")]
+        public async Task<ActionResult<DeleteUserResponse>> DeleteCurrentUser()
         {
+            var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            var result = await _identityService.DeleteUser(deleteUser);
+            var result = await _identityService.DeleteUser(id);
 
             if (result.Success)
             {
@@ -85,8 +87,8 @@ namespace DigitalPointBackEnd.Controllers
         }
 
         [Authorize]
-        [HttpPut("/update-users")]
-        public async Task<ActionResult<PutUserResponse>> PutUser([FromBody] PutUserRequest deleteUser)
+        [HttpPut("/update-current-user")]
+        public async Task<ActionResult<PutUserResponse>> PutCurrentUser([FromBody] PutUserRequest deleteUser)
         {
             var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
