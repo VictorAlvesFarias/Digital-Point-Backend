@@ -1,4 +1,4 @@
-﻿using DigitalPoint.Application.Dtos.WorkPoints.DeleteWorkPoint;
+﻿using DigitalPoint.Application.Dtos.Default;
 using DigitalPoint.Application.Dtos.WorkPoints.GetAllWorkPoints;
 using DigitalPoint.Application.Dtos.WorkPoints.InsertWorkPoint;
 using DigitalPoint.Application.Dtos.WorkPoints.PutWorkPoint;
@@ -73,11 +73,11 @@ namespace DigitalPointBackEnd.Controllers
 
         [Authorize]
         [HttpPut("/update-work-point")]
-        public async Task<ActionResult<PutWorkPointResponse>> PutWorkPoint([FromBody] PutWorkPointRequest putWorkPointRequest)
+        public async Task<ActionResult<PutWorkPointResponse>> PutWorkPoint([FromBody] PutWorkPointRequest putWorkPointRequest,int workPointId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var result = await _workPointService.PutWorkPoint(putWorkPointRequest, userId);
+            var result = await _workPointService.PutWorkPoint(putWorkPointRequest, userId, workPointId);
 
             if (result.Success)
             {
@@ -94,11 +94,11 @@ namespace DigitalPointBackEnd.Controllers
 
         [Authorize]
         [HttpDelete("/delete-work-point")]
-        public async Task<ActionResult<DeleteWorkPointResponse>> DeleteWorkPoint([FromBody] DeleteWorkPointRequest deleteWorkPointRequest)
+        public async Task<ActionResult<DefaultResponse>> DeleteWorkPoint(int workPointId)
         {
             var userId = User.FindFirst(ClaimTypes.NameIdentifier).Value;
 
-            var result = await _workPointService.DeleteWorkPoint(deleteWorkPointRequest, userId);
+            var result = await _workPointService.DeleteWorkPoint(workPointId, userId);
 
             if (result.Success)
             {

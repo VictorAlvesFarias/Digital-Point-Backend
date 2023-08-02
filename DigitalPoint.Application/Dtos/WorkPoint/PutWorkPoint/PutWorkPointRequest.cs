@@ -1,15 +1,14 @@
-﻿using DigitalPoint.Domain.Entities;
+﻿using System.ComponentModel.DataAnnotations;
 
 namespace DigitalPoint.Application.Dtos.WorkPoints.PutWorkPoint
 {
     public class PutWorkPointRequest
     {
-        public int Id { get; set; }
-        public DateTime Day { get;  set; }
-        public string DepartureTime { get;  set; }
-        public string EntryTime { get;  set; }
+        [Required(ErrorMessage = "Campo obrigatório")]
+        public DateTime DepartureTime { get;  set; }
 
-        public bool Attendance { get; set; }
+        [Required(ErrorMessage = "Campo obrigatório")]
+        public DateTime EntryTime { get;  set; }
 
     }
 }

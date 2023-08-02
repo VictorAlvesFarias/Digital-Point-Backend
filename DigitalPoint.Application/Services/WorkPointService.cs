@@ -1,5 +1,4 @@
-﻿using DigitalPoint.Application.Dtos.User.PutUser;
-using DigitalPoint.Application.Dtos.WorkPoints.DeleteWorkPoint;
+﻿using DigitalPoint.Application.Dtos.Default;
 using DigitalPoint.Application.Dtos.WorkPoints.GetAllWorkPoints;
 using DigitalPoint.Application.Dtos.WorkPoints.InsertWorkPoint;
 using DigitalPoint.Application.Dtos.WorkPoints.PutWorkPoint;
@@ -22,7 +21,7 @@ namespace DigitalPoint.Domain.Services
         private readonly UserManager<ApplicationUser> _userManager;
 
         public WorkPointService
-        ( 
+        (
             IWorkPointRepository workPointRepository,
             IBaseRepository<WorkPoint> baseRepository,
             UserManager<ApplicationUser> userManager
@@ -30,17 +29,15 @@ namespace DigitalPoint.Domain.Services
         {
             _userManager = userManager;
             _baseRepository = baseRepository;
-           _workPointRepository = workPointRepository;
+            _workPointRepository = workPointRepository;
         }
-        public async Task<PutWorkPointResponse> PutWorkPoint(PutWorkPointRequest putWorkPointRequest, string userId)
+        public async Task<PutWorkPointResponse> PutWorkPoint(PutWorkPointRequest putWorkPointRequest, string userId, int workPointId)
         {
-            var item = await _baseRepository.GetAsync(putWorkPointRequest.Id);
+            var item = await _baseRepository.GetAsync(workPointId);
 
             if (item.ApplicationUser.Id == userId)
             {
                 item.Update(
-                   day: putWorkPointRequest.Day,
-                   attendance: putWorkPointRequest.Attendance,
                    entryTime: putWorkPointRequest.EntryTime,
                    departureTime: putWorkPointRequest.DepartureTime
                );
@@ -56,18 +53,18 @@ namespace DigitalPoint.Domain.Services
 
             return result;
         }
-        public async Task<DeleteWorkPointResponse> DeleteWorkPoint(DeleteWorkPointRequest deleteWorkPoint, string userId)
+        public async Task<DefaultResponse> DeleteWorkPoint(int workPointId, string userId)
         {
-            var item = await _baseRepository.GetAsync(deleteWorkPoint.Id);
+            var item = await _baseRepository.GetAsync(workPointId);
 
-            if(item.ApplicationUser.Id == userId)
+            if (item.ApplicationUser.Id == userId)
             {
                 _baseRepository.RemoveAsync(item);
 
-                return new DeleteWorkPointResponse(true);
+                return new DefaultResponse(true);
             }
 
-            var result = new DeleteWorkPointResponse(false);
+            var result = new DefaultResponse(false);
 
             result.AddError("Unauthorized");
 
@@ -79,16 +76,16 @@ namespace DigitalPoint.Domain.Services
 
             var workPointsList = await _workPointRepository.GetAllAsync(user);
 
-            var result = new GetAllWorkPointResponse() 
+            var result = new GetAllWorkPointResponse()
             {
                 Success = true,
-                WorkPointsList = from list in workPointsList select new GetAllWorkPointResponse.WorkPoints()
-                { 
-                    Day=list.Day,
-                    Id =list.Id,    
-                    DepartureTime = list.DepartureTime, 
-                    EntryTime = list.EntryTime
-                }
+                WorkPointsList = from list in workPointsList
+                                 select new GetAllWorkPointResponse.WorkPoints()
+                                 {
+                                     Id = list.Id,
+                                     DepartureTime = list.DepartureTime,
+                                     EntryTime = list.EntryTime
+                                 }
             };
 
             return result;
@@ -101,9 +98,7 @@ namespace DigitalPoint.Domain.Services
             (
                 departureTime: workPoint.DepartureTime,
                 applicationUser: user,
-                entryTime: workPoint.EntryTime,
-                day: DateTime.Now,
-                attendance: true
+                entryTime: workPoint.EntryTime
             );
 
             _baseRepository.AddAsync(item);

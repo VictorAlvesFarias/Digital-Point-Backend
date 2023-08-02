@@ -7,6 +7,12 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Dtos\WorkPoint\DeleteWorkPoint\**" />
+    <EmbeddedResource Remove="Dtos\WorkPoint\DeleteWorkPoint\**" />
+    <None Remove="Dtos\WorkPoint\DeleteWorkPoint\**" />
+  </ItemGroup>
+
+  <ItemGroup>
           <ProjectReference Include="..\DigitalPoint.Domain\DigitalPoint.Domain.csproj" />	  	      
   </ItemGroup>
 

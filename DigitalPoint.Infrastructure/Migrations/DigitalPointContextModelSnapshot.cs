@@ -34,19 +34,11 @@ namespace DigitalPoint.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("Attendance")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Day")
+                    b.Property<DateTime>("DepartureTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DepartureTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EntryTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EntryTime")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 

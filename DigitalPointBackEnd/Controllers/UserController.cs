@@ -1,5 +1,4 @@
-﻿
-using DigitalPoint.Application.Dtos.User.DeleteUser;
+﻿using DigitalPoint.Application.Dtos.Default;
 using DigitalPoint.Application.Dtos.User.InsertUser;
 using DigitalPoint.Application.Dtos.User.LoginUser;
 using DigitalPoint.Application.Dtos.User.PutUser;
@@ -66,7 +65,7 @@ namespace DigitalPointBackEnd.Controllers
 
         [Authorize]        
         [HttpDelete("/delete-current-user")]
-        public async Task<ActionResult<DeleteUserResponse>> DeleteCurrentUser()
+        public async Task<ActionResult<DefaultResponse>> DeleteCurrentUser()
         {
             var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
@@ -88,11 +87,32 @@ namespace DigitalPointBackEnd.Controllers
 
         [Authorize]
         [HttpPut("/update-current-user")]
-        public async Task<ActionResult<PutUserResponse>> PutCurrentUser([FromBody] PutUserRequest deleteUser)
+        public async Task<ActionResult<PutUserResponse>> PutCurrentUser([FromBody] PutUserRequest putUserRequest)
         {
             var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            var result = await _identityService.PutUser(deleteUser, id);
+            var result = await _identityService.PutUser(putUserRequest, id);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            else if (result.Errors.Count > 0)
+            {
+                return BadRequest(result);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
+        [Authorize]
+        [HttpPut("/update-current-user-password")]
+        public async Task<ActionResult<PutUserResponse>> PutCurrentUserPassword([FromBody] PutUserRequest putUserRequest)
+        {
+            var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
+
+            var result = await _identityService.PutUser(putUserRequest, id);
 
             if (result.Success)
             {

@@ -9,9 +9,8 @@ namespace DigitalPoint.Application.Dtos.WorkPoints.GetAllWorkPoints
         public class WorkPoints
         {
             public int Id { get; set; }
-            public DateTime Day { get; set; }
-            public string DepartureTime { get; set; }
-            public string EntryTime { get; set; }
+            public DateTime DepartureTime { get; set; }
+            public DateTime EntryTime { get; set; }
         }
 
         public IEnumerable<WorkPoints> WorkPointsList { get; set; }

@@ -4,11 +4,12 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using DigitalPoint.Application.Interfaces.Identity;
-using DigitalPoint.Application.Dtos.User.DeleteUser;
 using DigitalPoint.Application.Dtos.User.InsertUser;
 using DigitalPoint.Application.Dtos.User.LoginUser;
 using DigitalPoint.Application.Dtos.User.PutUser;
 using DigitalPoint.Domain.Entities;
+using DigitalPoint.Application.Dtos.Default;
+using DigitalPoint.Application.Dtos.User.PutUserPassword;
 
 namespace DigitalPoint.Identity.Services
 {
@@ -73,7 +74,7 @@ namespace DigitalPoint.Identity.Services
 
             var applicationUser = new ApplicationUser
             {
-                UserName = insertUser.Email,
+                UserName = insertUser.Name,
                 Email = insertUser.Email,
                 EmailConfirmed = true,
             };
@@ -130,13 +131,13 @@ namespace DigitalPoint.Identity.Services
              );
         }
 
-        public async Task<DeleteUserResponse> DeleteUser(string id) {
+        public async Task<DefaultResponse> DeleteUser(string id) {
                 var user = await _userManager.FindByIdAsync(id);
 
                 if (user != null) {
                     var result = await _userManager.DeleteAsync(user);
 
-                    var deleteUserResponse = new DeleteUserResponse(result.Succeeded);
+                    var deleteUserResponse = new DefaultResponse(result.Succeeded);
 
                     if (result.Succeeded)
                     {
@@ -153,7 +154,7 @@ namespace DigitalPoint.Identity.Services
 
                 else
                 {
-                    var deleteUserResponse = new DeleteUserResponse(false);
+                    var deleteUserResponse = new DefaultResponse(false);
                     deleteUserResponse.AddError("User is not find");
                     return deleteUserResponse;
                 }
@@ -163,11 +164,8 @@ namespace DigitalPoint.Identity.Services
         {
             var user = await _userManager.FindByIdAsync(Id);
 
-            var password = _userManager.PasswordHasher.HashPassword(user, putUser.Password);
-
             user.UserName = putUser.UserName;
             user.Email = putUser.Email;
-            user.PasswordHash = password;
 
             var result = await _userManager.UpdateAsync(user);
 
@@ -187,6 +185,49 @@ namespace DigitalPoint.Identity.Services
             }
 
             return putUserResponse;
+        }
+
+        public async Task<DefaultResponse> PutUserPassword(PutUserPasswordRequest putUser, string Id)
+        {
+
+            var user = await _userManager.FindByIdAsync(Id);
+
+            var passwordHash = _userManager.PasswordHasher.HashPassword(user, putUser.Password);
+
+            var newPassswordHash = _userManager.PasswordHasher.HashPassword(user, putUser.NewPassword);
+
+            if (passwordHash==user.PasswordHash)
+            {
+
+                user.PasswordHash = passwordHash;
+
+                var result = await _userManager.UpdateAsync(user);
+
+                var putUserPasswordResponse = new DefaultResponse(result.Succeeded);
+
+                if (result.Succeeded)
+                {
+                    return new DefaultResponse(true);
+                }
+
+                else if (!result.Succeeded)
+                {
+                    putUserPasswordResponse.AddErrors(result.Errors.Select(r => r.Description));
+                }
+
+                return putUserPasswordResponse;
+
+            }
+
+            else
+            {
+                var putUserPasswordResponse = new DefaultResponse(false);
+
+                putUserPasswordResponse.AddError("Invalid Password");
+
+                return putUserPasswordResponse;
+            }
+
         }
 
     }

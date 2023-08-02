@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalPoint.Infrastructure.Migrations
 {
     [DbContext(typeof(DigitalPointContext))]
-    [Migration("20230719163205_UpdateMigration4")]
-    partial class UpdateMigration4
+    [Migration("20230802164427_MigrationUpdate")]
+    partial class MigrationUpdate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,19 +37,11 @@ namespace DigitalPoint.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<bool>("Attendance")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime>("Day")
+                    b.Property<DateTime>("DepartureTime")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("DepartureTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<string>("EntryTime")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                    b.Property<DateTime>("EntryTime")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("Id");
 
