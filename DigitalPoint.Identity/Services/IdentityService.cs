@@ -10,6 +10,8 @@ using DigitalPoint.Application.Dtos.User.PutUser;
 using DigitalPoint.Domain.Entities;
 using DigitalPoint.Application.Dtos.Default;
 using DigitalPoint.Application.Dtos.User.PutUserPassword;
+using Microsoft.AspNetCore.Mvc;
+using DigitalPoint.Application.Dtos.User.DeleteUser;
 
 namespace DigitalPoint.Identity.Services
 {
@@ -74,9 +76,10 @@ namespace DigitalPoint.Identity.Services
 
             var applicationUser = new ApplicationUser
             {
-                UserName = insertUser.Name,
+                UserName = insertUser.Email,
                 Email = insertUser.Email,
                 EmailConfirmed = true,
+                Name = insertUser.Name,
             };
 
             var result = await _userManager.CreateAsync(applicationUser, insertUser.Password);
@@ -131,13 +134,22 @@ namespace DigitalPoint.Identity.Services
              );
         }
 
-        public async Task<DefaultResponse> DeleteUser(string id) {
-                var user = await _userManager.FindByIdAsync(id);
+        public async Task<DefaultResponse> DeleteUser(string id,[FromBody]DeleteCurrentUserRequest deleteCurrentUserRequest) {
 
-                if (user != null) {
+            var user = await _userManager.FindByIdAsync(id);
+
+            var login = await _singInManager.PasswordSignInAsync(user.Email,deleteCurrentUserRequest.Password, false, false);
+
+            if (user != null) 
+            {
+
+                var deleteUserResponse = new DefaultResponse();
+
+                if (login.Succeeded)
+                {
                     var result = await _userManager.DeleteAsync(user);
 
-                    var deleteUserResponse = new DefaultResponse(result.Succeeded);
+                    deleteUserResponse.Success = result.Succeeded;
 
                     if (result.Succeeded)
                     {
@@ -152,20 +164,27 @@ namespace DigitalPoint.Identity.Services
                     return deleteUserResponse;
                 }
 
-                else
-                {
-                    var deleteUserResponse = new DefaultResponse(false);
-                    deleteUserResponse.AddError("User is not find");
-                    return deleteUserResponse;
-                }
+                deleteUserResponse.Success = false;
+                deleteUserResponse.AddError("Incorrect Password");
+                return deleteUserResponse;
+
+            }
+
+            else
+            {
+                var deleteUserResponse = new DefaultResponse(false);
+                deleteUserResponse.AddError("User is not find");
+                return deleteUserResponse;
+            }
         }
 
         public async Task<PutUserResponse> PutUser(PutUserRequest putUser, string Id)
         {
             var user = await _userManager.FindByIdAsync(Id);
 
-            user.UserName = putUser.UserName;
-            user.Email = putUser.Email;
+            user.UserName = putUser.Email == null ? putUser.Email : user.Email;
+            user.Email = putUser.Email == null ? putUser.Email : user.Email;
+            user.Name = putUser.UserName == null ? putUser.UserName : user.Name;
 
             var result = await _userManager.UpdateAsync(user);
 
@@ -192,14 +211,16 @@ namespace DigitalPoint.Identity.Services
 
             var user = await _userManager.FindByIdAsync(Id);
 
+            var login = await _singInManager.PasswordSignInAsync(user.Email, putUser.Password, false, false);
+
             var passwordHash = _userManager.PasswordHasher.HashPassword(user, putUser.Password);
 
             var newPassswordHash = _userManager.PasswordHasher.HashPassword(user, putUser.NewPassword);
 
-            if (passwordHash==user.PasswordHash)
+            if (login.Succeeded == true)
             {
 
-                user.PasswordHash = passwordHash;
+                user.PasswordHash = newPassswordHash;
 
                 var result = await _userManager.UpdateAsync(user);
 
@@ -210,12 +231,14 @@ namespace DigitalPoint.Identity.Services
                     return new DefaultResponse(true);
                 }
 
-                else if (!result.Succeeded)
+                else 
                 {
                     putUserPasswordResponse.AddErrors(result.Errors.Select(r => r.Description));
+                    putUserPasswordResponse.AddError("Fail update");
+                    return putUserPasswordResponse;
                 }
 
-                return putUserPasswordResponse;
+                
 
             }
 

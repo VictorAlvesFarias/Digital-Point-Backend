@@ -1,7 +1,9 @@
 ﻿using DigitalPoint.Application.Dtos.Default;
+using DigitalPoint.Application.Dtos.User.DeleteUser;
 using DigitalPoint.Application.Dtos.User.InsertUser;
 using DigitalPoint.Application.Dtos.User.LoginUser;
 using DigitalPoint.Application.Dtos.User.PutUser;
+using DigitalPoint.Application.Dtos.User.PutUserPassword;
 using DigitalPoint.Application.Interfaces.Identity;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -65,11 +67,11 @@ namespace DigitalPointBackEnd.Controllers
 
         [Authorize]        
         [HttpDelete("/delete-current-user")]
-        public async Task<ActionResult<DefaultResponse>> DeleteCurrentUser()
+        public async Task<ActionResult<DefaultResponse>> DeleteCurrentUser([FromBody] DeleteCurrentUserRequest deleteCurrentUserRequest)
         {
             var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            var result = await _identityService.DeleteUser(id);
+            var result = await _identityService.DeleteUser(id, deleteCurrentUserRequest);
 
             if (result.Success)
             {
@@ -108,11 +110,11 @@ namespace DigitalPointBackEnd.Controllers
 
         [Authorize]
         [HttpPut("/update-current-user-password")]
-        public async Task<ActionResult<PutUserResponse>> PutCurrentUserPassword([FromBody] PutUserRequest putUserRequest)
+        public async Task<ActionResult<PutUserResponse>> PutCurrentUserPassword([FromBody] PutUserPasswordRequest putUserPasswordRequest)
         {
             var id = User.Claims.Where(x => x.Type == ClaimTypes.NameIdentifier).FirstOrDefault()?.Value;
 
-            var result = await _identityService.PutUser(putUserRequest, id);
+            var result = await _identityService.PutUserPassword(putUserPasswordRequest, id);
 
             if (result.Success)
             {

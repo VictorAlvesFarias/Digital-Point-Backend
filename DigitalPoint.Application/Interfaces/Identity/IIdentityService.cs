@@ -1,4 +1,5 @@
 ﻿using DigitalPoint.Application.Dtos.Default;
+using DigitalPoint.Application.Dtos.User.DeleteUser;
 using DigitalPoint.Application.Dtos.User.InsertUser;
 using DigitalPoint.Application.Dtos.User.LoginUser;
 using DigitalPoint.Application.Dtos.User.PutUser;
@@ -14,7 +15,7 @@ namespace DigitalPoint.Application.Interfaces.Identity
 
         Task<LoginUserResponse> LoginUser(LoginUserRequest loginUser);
 
-        Task<DefaultResponse> DeleteUser(string id);
+        Task<DefaultResponse> DeleteUser(string id, DeleteCurrentUserRequest deleteCurrentUserRequest);
 
         Task<string> CreateToken(IEnumerable<Claim> tokenClaims, DateTime expiration);
 

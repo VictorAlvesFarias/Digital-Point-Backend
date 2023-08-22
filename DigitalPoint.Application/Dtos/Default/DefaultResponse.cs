@@ -2,9 +2,9 @@
 {
     public class DefaultResponse
     {
-        public bool Success { get; private set; }
+        public bool Success { get; set; }
 
-        public List<string> Errors { get; private set; }
+        public List<string> Errors { get; set; }
 
         public DefaultResponse(bool success = true) : this() => Success = success;
 

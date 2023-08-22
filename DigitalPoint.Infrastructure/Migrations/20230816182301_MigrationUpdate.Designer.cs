@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DigitalPoint.Infrastructure.Migrations
 {
     [DbContext(typeof(DigitalPointContext))]
-    [Migration("20230802164427_MigrationUpdate")]
+    [Migration("20230816182301_MigrationUpdate")]
     partial class MigrationUpdate
     {
         /// <inheritdoc />
@@ -270,7 +270,7 @@ namespace DigitalPoint.Infrastructure.Migrations
             modelBuilder.Entity("DigitalPoint.Domain.Entities.WorkPoint", b =>
                 {
                     b.HasOne("DigitalPoint.Domain.Entities.ApplicationUser", "ApplicationUser")
-                        .WithMany()
+                        .WithMany("WorkPoint")
                         .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -327,6 +327,11 @@ namespace DigitalPoint.Infrastructure.Migrations
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+                });
+
+            modelBuilder.Entity("DigitalPoint.Domain.Entities.ApplicationUser", b =>
+                {
+                    b.Navigation("WorkPoint");
                 });
 #pragma warning restore 612, 618
         }

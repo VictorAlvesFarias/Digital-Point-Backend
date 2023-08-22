@@ -35,7 +35,7 @@ namespace DigitalPoint.Domain.Services
         {
             var item = await _baseRepository.GetAsync(workPointId);
 
-            if (item.ApplicationUser.Id == userId)
+            if (item.ApplicationUserId == userId)
             {
                 item.Update(
                    entryTime: putWorkPointRequest.EntryTime,
@@ -57,7 +57,7 @@ namespace DigitalPoint.Domain.Services
         {
             var item = await _baseRepository.GetAsync(workPointId);
 
-            if (item.ApplicationUser.Id == userId)
+            if (item.ApplicationUserId == userId)
             {
                 _baseRepository.RemoveAsync(item);
 
