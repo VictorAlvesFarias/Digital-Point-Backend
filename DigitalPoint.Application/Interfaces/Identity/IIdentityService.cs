@@ -25,5 +25,7 @@ namespace DigitalPoint.Application.Interfaces.Identity
 
         Task<DefaultResponse> PutUserPassword(PutUserPasswordRequest putUser, string Id);
 
+        Task<DefaultResponse> EmailVerify(string email);
+
     }
 }

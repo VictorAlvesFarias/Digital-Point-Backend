@@ -38,8 +38,8 @@ namespace DigitalPoint.Domain.Services
             if (item.ApplicationUserId == userId)
             {
                 item.Update(
-                   entryTime: putWorkPointRequest.EntryTime,
-                   departureTime: putWorkPointRequest.DepartureTime
+                   entryTime: putWorkPointRequest.EntryTime.ToUniversalTime(),
+                   departureTime: putWorkPointRequest.DepartureTime.ToUniversalTime()
                );
 
                 _baseRepository.UpdateAsync(item);
@@ -49,7 +49,7 @@ namespace DigitalPoint.Domain.Services
 
             var result = new PutWorkPointResponse(false);
 
-            result.AddError("Unauthorized");
+            result.AddError("Não autorizado");
 
             return result;
         }
@@ -66,7 +66,7 @@ namespace DigitalPoint.Domain.Services
 
             var result = new DefaultResponse(false);
 
-            result.AddError("Unauthorized");
+            result.AddError("Não autorizado");
 
             return result;
         }
@@ -83,8 +83,8 @@ namespace DigitalPoint.Domain.Services
                                  select new GetAllWorkPointResponse.WorkPoints()
                                  {
                                      Id = list.Id,
-                                     DepartureTime = list.DepartureTime,
-                                     EntryTime = list.EntryTime
+                                     DepartureTime = list.DepartureTime.ToUniversalTime(),
+                                     EntryTime = list.EntryTime.ToUniversalTime()
                                  }
             };
 

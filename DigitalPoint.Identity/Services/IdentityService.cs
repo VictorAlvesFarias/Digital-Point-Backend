@@ -12,6 +12,7 @@ using DigitalPoint.Application.Dtos.Default;
 using DigitalPoint.Application.Dtos.User.PutUserPassword;
 using Microsoft.AspNetCore.Mvc;
 using DigitalPoint.Application.Dtos.User.DeleteUser;
+using System.Security.Policy;
 
 namespace DigitalPoint.Identity.Services
 {
@@ -24,13 +25,15 @@ namespace DigitalPoint.Identity.Services
 
         private readonly JwtOptions _jwtOptions;
 
-        public IdentityService(SignInManager<ApplicationUser> singInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions) {
+        public IdentityService(SignInManager<ApplicationUser> singInManager, UserManager<ApplicationUser> userManager, IOptions<JwtOptions> jwtOptions)
+        {
             _singInManager = singInManager;
             _userManager = userManager;
             _jwtOptions = jwtOptions.Value;
         }
 
-        public async Task<IList<Claim>> GetClaimsAndRoles(ApplicationUser user) {
+        public async Task<IList<Claim>> GetClaimsAndRoles(ApplicationUser user)
+        {
 
             var claims = await _userManager.GetClaimsAsync(user);
 
@@ -55,7 +58,8 @@ namespace DigitalPoint.Identity.Services
 
         }
 
-        public async Task<string> CreateToken(IEnumerable<Claim> tokenClaims,DateTime expiration) {
+        public async Task<string> CreateToken(IEnumerable<Claim> tokenClaims, DateTime expiration)
+        {
 
             var jwt = new JwtSecurityToken(
                 issuer: _jwtOptions.Issuer,
@@ -72,7 +76,8 @@ namespace DigitalPoint.Identity.Services
 
         }
 
-        public async Task<InsertUserResponse> InsertUser(InsertUserRequest insertUser) {
+        public async Task<InsertUserResponse> InsertUser(InsertUserRequest insertUser)
+        {
 
             var applicationUser = new ApplicationUser
             {
@@ -100,25 +105,29 @@ namespace DigitalPoint.Identity.Services
 
         }
 
-        public async Task<LoginUserResponse> LoginUser(LoginUserRequest loginUser) {
+        public async Task<LoginUserResponse> LoginUser(LoginUserRequest loginUser)
+        {
 
             var result = await _singInManager.PasswordSignInAsync(loginUser.Email, loginUser.Password, false, false);
 
             var loginUserResponse = new LoginUserResponse(result.Succeeded);
 
-            if (result.Succeeded) {
+            if (result.Succeeded)
+            {
                 return await CreateCredentials(loginUser.Email);
             }
 
-            else if (!result.Succeeded) {
-                loginUserResponse.AddError("Fail Login");
+            else if (!result.Succeeded)
+            {
+                loginUserResponse.AddError("Senha ou Usuário inválido");
             }
 
             return loginUserResponse;
 
         }
 
-        public async Task<LoginUserResponse> CreateCredentials(string Email) {
+        public async Task<LoginUserResponse> CreateCredentials(string Email)
+        {
 
             var user = await _userManager.FindByNameAsync(Email);
 
@@ -128,19 +137,26 @@ namespace DigitalPoint.Identity.Services
 
             var token = await CreateToken(claims, expiresDate);
 
-            return new LoginUserResponse(
-                 success: true,
-                 token: token
-             );
+            var loginUserResponse = new LoginUserResponse(true);
+
+            loginUserResponse.User = new LoginUserResponse.Data()
+            {
+                Name = user.Name,
+                Email = user.Email,
+                Token = token,
+            };
+
+            return loginUserResponse;
         }
 
-        public async Task<DefaultResponse> DeleteUser(string id,[FromBody]DeleteCurrentUserRequest deleteCurrentUserRequest) {
+        public async Task<DefaultResponse> DeleteUser(string id, [FromBody] DeleteCurrentUserRequest deleteCurrentUserRequest)
+        {
 
             var user = await _userManager.FindByIdAsync(id);
 
-            var login = await _singInManager.PasswordSignInAsync(user.Email,deleteCurrentUserRequest.Password, false, false);
+            var login = await _singInManager.PasswordSignInAsync(user.Email, deleteCurrentUserRequest.Password, false, false);
 
-            if (user != null) 
+            if (user != null)
             {
 
                 var deleteUserResponse = new DefaultResponse();
@@ -161,11 +177,12 @@ namespace DigitalPoint.Identity.Services
                         deleteUserResponse.AddErrors(result.Errors.Select(r => r.Description));
                     }
 
+                    deleteUserResponse.AddError("Houve algum erro interno");
                     return deleteUserResponse;
                 }
 
                 deleteUserResponse.Success = false;
-                deleteUserResponse.AddError("Incorrect Password");
+                deleteUserResponse.AddError("Senha incorreta");
                 return deleteUserResponse;
 
             }
@@ -173,7 +190,7 @@ namespace DigitalPoint.Identity.Services
             else
             {
                 var deleteUserResponse = new DefaultResponse(false);
-                deleteUserResponse.AddError("User is not find");
+                deleteUserResponse.AddError("Usuário não encontrado");
                 return deleteUserResponse;
             }
         }
@@ -206,6 +223,25 @@ namespace DigitalPoint.Identity.Services
             return putUserResponse;
         }
 
+        public async Task<DefaultResponse> EmailVerify(string email)
+        {
+
+            var user = await _userManager.FindByEmailAsync(email);
+
+            var result = new DefaultResponse(user == null ? true : false);
+
+            if (user == null)
+            {
+
+                return result;
+
+            }
+
+            result.AddError("Email indisponivel");
+
+            return result;
+        }
+
         public async Task<DefaultResponse> PutUserPassword(PutUserPasswordRequest putUser, string Id)
         {
 
@@ -228,17 +264,18 @@ namespace DigitalPoint.Identity.Services
 
                 if (result.Succeeded)
                 {
-                    return new DefaultResponse(true);
-                }
-
-                else 
-                {
-                    putUserPasswordResponse.AddErrors(result.Errors.Select(r => r.Description));
-                    putUserPasswordResponse.AddError("Fail update");
                     return putUserPasswordResponse;
                 }
 
-                
+                else if (result.Errors.Count() > 0)
+                {
+                    putUserPasswordResponse.AddErrors(result.Errors.Select(r => r.Description));
+                    return putUserPasswordResponse;
+                }
+
+                putUserPasswordResponse.AddError("Houve algum erro interno");
+                return putUserPasswordResponse;
+
 
             }
 
@@ -246,7 +283,7 @@ namespace DigitalPoint.Identity.Services
             {
                 var putUserPasswordResponse = new DefaultResponse(false);
 
-                putUserPasswordResponse.AddError("Invalid Password");
+                putUserPasswordResponse.AddError("Senha incorreta");
 
                 return putUserPasswordResponse;
             }
@@ -254,4 +291,4 @@ namespace DigitalPoint.Identity.Services
         }
 
     }
- }
+}

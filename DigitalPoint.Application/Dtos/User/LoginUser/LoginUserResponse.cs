@@ -2,18 +2,22 @@
 {
     public class LoginUserResponse
     {
-        public bool Success { get; private set; }
+        public class Data
+        {
+            public string Name { get; set; }
 
-        public string Token { get; private set; }
+            public string Token { get; set; }
+
+            public string Email { get; set; }   
+        }
+
+        public Data User { get; set; }
+
+        public bool Success { get; private set; }
 
         public List<string> Errors { get; private set; }
 
         public LoginUserResponse(bool success = true) : this() => Success = success;
-
-        public LoginUserResponse(bool success, string token) : this(success)
-        {
-            Token = token;
-        }
 
         public LoginUserResponse() => Errors = new List<string>();
 

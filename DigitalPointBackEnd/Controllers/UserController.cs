@@ -1,5 +1,6 @@
 ﻿using DigitalPoint.Application.Dtos.Default;
 using DigitalPoint.Application.Dtos.User.DeleteUser;
+using DigitalPoint.Application.Dtos.User.EmailVerify;
 using DigitalPoint.Application.Dtos.User.InsertUser;
 using DigitalPoint.Application.Dtos.User.LoginUser;
 using DigitalPoint.Application.Dtos.User.PutUser;
@@ -49,7 +50,7 @@ namespace DigitalPointBackEnd.Controllers
         [HttpPost("/sign-user")]
         public async Task<ActionResult<LoginUserResponse>> Login([FromBody] LoginUserRequest userLogin)
         {
-
+ 
             var result = await _identityService.LoginUser(userLogin);
 
             if (result.Success)
@@ -65,7 +66,7 @@ namespace DigitalPointBackEnd.Controllers
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
 
-        [Authorize]        
+        [Authorize]
         [HttpDelete("/delete-current-user")]
         public async Task<ActionResult<DefaultResponse>> DeleteCurrentUser([FromBody] DeleteCurrentUserRequest deleteCurrentUserRequest)
         {
@@ -128,5 +129,24 @@ namespace DigitalPointBackEnd.Controllers
 
             return StatusCode(StatusCodes.Status500InternalServerError);
         }
+
+        [HttpPost("/verify-email")]
+        public async Task<ActionResult<DefaultResponse>> VerifyEmail([FromBody] EmailVerifyRequest emailVerifyRequest)
+        {
+            var result = await _identityService.EmailVerify(emailVerifyRequest.Email);
+
+            if (result.Success)
+            {
+                return Ok(result);
+            }
+
+            else if (result.Errors.Count > 0)
+            {
+                return BadRequest(result);
+            }
+
+            return StatusCode(StatusCodes.Status500InternalServerError);
+        }
+
     }
 }
