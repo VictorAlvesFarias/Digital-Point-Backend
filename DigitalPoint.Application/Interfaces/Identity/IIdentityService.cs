@@ -27,5 +27,7 @@ namespace DigitalPoint.Application.Interfaces.Identity
 
         Task<DefaultResponse> EmailVerify(string email);
 
+        Task<ApplicationUser?> FindByIdAsync(string id);
+
     }
 }

@@ -26,7 +26,7 @@ namespace DigitalPoint.Infrastructure.Repositories
 
         public async void RemoveAsync(TEntity item)
         {
-            _context.Remove(item);
+             _context.Remove(item);
 
             _context.SaveChanges();
         }

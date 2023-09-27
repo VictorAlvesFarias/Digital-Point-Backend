@@ -290,5 +290,12 @@ namespace DigitalPoint.Identity.Services
 
         }
 
+        public async Task<ApplicationUser?> FindByIdAsync(string Id)
+        {
+            var user = await _userManager.FindByIdAsync(Id);
+
+            return user;
+        }
+
     }
 }

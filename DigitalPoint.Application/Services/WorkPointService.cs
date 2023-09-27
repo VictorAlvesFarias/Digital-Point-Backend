@@ -3,6 +3,7 @@ using DigitalPoint.Application.Dtos.WorkPoints.GetAllWorkPoints;
 using DigitalPoint.Application.Dtos.WorkPoints.InsertWorkPoint;
 using DigitalPoint.Application.Dtos.WorkPoints.PutWorkPoint;
 using DigitalPoint.Application.Interfaces.BaseRepository;
+using DigitalPoint.Application.Interfaces.Identity;
 using DigitalPoint.Application.Interfaces.WorkPoints;
 using DigitalPoint.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -18,13 +19,13 @@ namespace DigitalPoint.Domain.Services
 
         private readonly WorkPoint _wordPoint;
 
-        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly IIdentityService _userManager;
 
         public WorkPointService
         (
             IWorkPointRepository workPointRepository,
             IBaseRepository<WorkPoint> baseRepository,
-            UserManager<ApplicationUser> userManager
+            IIdentityService userManager
         )
         {
             _userManager = userManager;
@@ -94,16 +95,26 @@ namespace DigitalPoint.Domain.Services
         {
             var user = await _userManager.FindByIdAsync(userId);
 
-            var item = WorkPoint.Create
-            (
-                departureTime: workPoint.DepartureTime,
-                applicationUser: user,
-                entryTime: workPoint.EntryTime
-            );
+            if (user == null)
+            {
+                return new InsertWorkPointResponse(false);
+            }
+            else
+            {
+                var item = WorkPoint.Create
+                (
+                    departureTime: workPoint.DepartureTime,
+                    applicationUser: user,
+                    entryTime: workPoint.EntryTime
+                );
 
-            _baseRepository.AddAsync(item);
+                _baseRepository.AddAsync(item);
+                
+                return new InsertWorkPointResponse(true);
+            }
 
-            return new InsertWorkPointResponse(true);
+
+
         }
     }
 }
